@@ -64,11 +64,26 @@ function main() {
     gl.enableVertexAttribArray(aColor)
 
     // Grafika Interaktif
+    // Mouse
     function onMouseClick(e) {
         freeze = !freeze
     }
 
     document.addEventListener("click", onMouseClick)
+
+    // Keyboard
+    function onKeydown(e) {
+        if(e.keyCode == 32)
+            freeze = !freeze
+    }
+
+    function onKeyup(e) {
+        if(e.keyCode == 32)
+            freeze = !freeze
+    }
+
+    document.addEventListener("keydown", onKeydown)
+    document.addEventListener("keyup", onKeyup)
 
     function render() {
         gl.clearColor(1.0, 0.65, 0.0, 1.0)
