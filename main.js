@@ -3,10 +3,10 @@ function main() {
     var gl = kanvas.getContext("webgl")
 
     var vertices = [
-        0.5, 0.5,
-        0.0, 0.0,
-        -0.5, 0.5,
-        0.0, 1.0
+        0.5, 0.5, 0.0, 1.0, 1.0, // Kanan atas (Biru langit)
+        0.0, 0.0, 1.0, 0.0, 1.0, // Bawah tengah (Magenta)
+        -0.5, 0.5, 1.0, 1.0, 0.0, // Kiri atas (Kuning)
+        0.0, 1.0, 1.0, 1.0, 1.0 // Atas tengah (Putih)
     ]
 
     var buffer = gl.createBuffer()
@@ -16,11 +16,15 @@ function main() {
     // Vertex shader
     var vertexShaderCode = `
     attribute vec2 aPosition;
+    attribute vec3 aColor;
+    uniform float uTheta;
+    varying vec3 vColor;
     void main() {
-        float x = aPosition.x;
-        float y = aPosition.y;
+        float x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
+        float y = cos(uTheta) * aPosition.x + sin(uTheta) * aPosition.y;
         gl_PointSize = 10.0;
         gl_Position = vec4(x, y, 0.0, 1.0);
+        vColor = aColor;
     }`
 
     var vertexShaderObject = gl.createShader(gl.VERTEX_SHADER)
@@ -30,11 +34,9 @@ function main() {
     // Fragment shader
     var fragmentShaderCode = `
     precision mediump float;
+    varying vec3 vColor;
     void main() {
-        float r = 0.0;
-        float g = 0.0;
-        float b = 1.0;
-        gl_FragColor = vec4(r, g, b, 1.0);
+        gl_FragColor = vec4(vColor, 1.0);
     }`
     var fragmentShaderObject = gl.createShader(gl.FRAGMENT_SHADER)
     gl.shaderSource(fragmentShaderObject, fragmentShaderCode)
@@ -46,13 +48,29 @@ function main() {
     gl.linkProgram(shaderProgram)
     gl.useProgram(shaderProgram)
 
+    // Variabel Lokal
+    var theta = 0.0;
+
+    // Variabel pointer ke GLSL
+    var uTheta = gl.getUniformLocation(shaderProgram, "uTheta")
+
     var aPosition = gl.getAttribLocation(shaderProgram, "aPosition")
-    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+    gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 0)
     gl.enableVertexAttribArray(aPosition)
 
-    gl.clearColor(1.0, 0.65, 0.0, 1.0)
-    //          Merah, Hijau, Biru, Transparansi
-    gl.clear(gl.COLOR_BUFFER_BIT)
+    var aColor = gl.getAttribLocation(shaderProgram, "aColor")
+    gl.vertexAttribPointer(aColor, 3, gl.FLOAT, false, 5 * Float32Array.BYTES_PER_ELEMENT, 2 * Float32Array.BYTES_PER_ELEMENT)
+    gl.enableVertexAttribArray(aColor)
 
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 4)
+    function render() {
+        gl.clearColor(1.0, 0.65, 0.0, 1.0)
+        //          Merah, Hijau, Biru, Transparansi
+        gl.clear(gl.COLOR_BUFFER_BIT)
+        theta += 0.1
+        gl.uniform1f(uTheta, theta)
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, 4)
+    }
+    
+    setInterval(render, 1000/60)
+
 }
