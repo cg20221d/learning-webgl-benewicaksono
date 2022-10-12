@@ -113,6 +113,7 @@ function main() {
         verticalDelta -= verticalSpeed;
         var model = glMatrix.mat4.create(); // Membuat matriks identitas
         glMatrix.mat4.translate(model, model, [horizontalDelta, verticalDelta, 0.0]);
+        glMatrix.mat4.rotateZ(model, model, theta);
         gl.uniformMatrix4fv(uModel, false, model);
         gl.drawArrays(gl.TRIANGLE_FAN, 0, 4);
         requestAnimationFrame(render);
