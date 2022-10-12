@@ -20,10 +20,19 @@ function main() {
     uniform float uTheta;
     varying vec3 vColor;
     void main() {
-        float x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
-        float y = cos(uTheta) * aPosition.x + sin(uTheta) * aPosition.y;
-        gl_PointSize = 10.0;
-        gl_Position = vec4(x, y, 0.0, 1.0);
+        // float x = -sin(uTheta) * aPosition.x + cos(uTheta) * aPosition.y;
+        // float y = cos(uTheta) * aPosition.x + sin(uTheta) * aPosition.y;
+        // gl_PointSize = 10.0;
+        // gl_Position = vec4(x, y, 0.0, 1.0);
+
+
+        vec2 position = aPosition;
+        vec3 d = vec3(0.5, -0.5, 0.0);
+        mat4 translation = mat4(1.0, 0.0, 0.0, 0.0,
+                                0.0, 1.0, 0.0, 0.0,
+                                0.0, 0.0, 1.0, 0.0,
+                                d.x, d.y, d.z, 1.0);
+        gl_Position = translation * vec4(position, 0.0, 1.0);
         vColor = aColor;
     }`
 
@@ -65,37 +74,44 @@ function main() {
 
     // Grafika Interaktif
     // Mouse
-    function onMouseClick(e) {
-        freeze = !freeze
-    }
+    // function onMouseClick(e) {
+    //     freeze = !freeze
+    // }
 
-    document.addEventListener("click", onMouseClick)
+    // document.addEventListener("click", onMouseClick)
 
     // Keyboard
-    function onKeydown(e) {
-        if(e.keyCode == 32)
+    // function onKeydown(e) {
+    //     if(e.keyCode == 32)
+    //         freeze = !freeze
+    // }
+
+    // function onKeyup(e) {
+    //     if(e.keyCode == 32)
+    //         freeze = !freeze
+    // }
+
+    // document.addEventListener("keydown", onKeydown)
+    // document.addEventListener("keyup", onKeyup)
+
+    function onKeyW(e) {
+        if(e.keyCode == 87)
             freeze = !freeze
     }
 
-    function onKeyup(e) {
-        if(e.keyCode == 32)
-            freeze = !freeze
-    }
-
-    document.addEventListener("keydown", onKeydown)
-    document.addEventListener("keyup", onKeyup)
+    document.addEventListener("keydown", onKeyW)
 
     function render() {
         gl.clearColor(1.0, 0.65, 0.0, 1.0)
         //          Merah, Hijau, Biru, Transparansi
         gl.clear(gl.COLOR_BUFFER_BIT)
 
-        if(!freeze) {
-            theta += 0.1
-            gl.uniform1f(uTheta, theta)
-        }
+        // if(!freeze) {
+        //     theta += 0.1
+        //     gl.uniform1f(uTheta, theta)
+        // }
         gl.drawArrays(gl.TRIANGLE_FAN, 0, 4)
-        requestAnimationFrame(render)
+        // requestAnimationFrame(render)
     }
     
     render()
